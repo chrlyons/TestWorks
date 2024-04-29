@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class UserCreate(BaseModel):
@@ -17,14 +17,8 @@ class ReportCreate(ReportBase):
 class Report(ReportBase):
     id: int
 
-    class Config(ConfigDict):
-        from_attributes = True
-
 
 class ReportSchema(BaseModel):
     id: int
     name: str
     data: str
-
-    class Config(ConfigDict):
-        from_attributes = True
