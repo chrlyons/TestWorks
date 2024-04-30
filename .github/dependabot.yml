@@ -1,6 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/app"
+    directory: "/backend-app"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend-app"
     schedule:
       interval: "monthly"
