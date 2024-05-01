@@ -1,9 +1,55 @@
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Locator, Browser, Page
+
+
+class LoginPage:
+    def __init__(self, page):
+        self.page = page
+
+    @property
+    def email_input(self) -> Locator:
+        return self.page.get_by_test_id('email-input')
+
+    @property
+    def password_input(self) -> Locator:
+        return self.page.get_by_test_id('password-input')
+
+    @property
+    def login_button(self) -> Locator:
+        return self.page.get_by_test_id('login-button')
+
+    @property
+    def welcome_message(self) -> Locator:
+        return self.page.get_by_test_id('welcome-message')
+
+    @property
+    def error_message(self) -> Locator:
+        return self.page.get_by_test_id('error-message')
+
+    def fill_email(self, email):
+        self.email_input.fill(email)
+
+    def fill_password(self, password):
+        self.password_input.fill(password)
+
+    def click_login(self):
+        self.login_button.click()
+
+    def get_welcome_message_text(self):
+        return self.welcome_message.text_content()
+
+    def get_error_message_text(self):
+        return self.error_message.text_content()
+
+    def is_email_input_present(self):
+        return self.email_input.is_visible()
+
+    def is_password_input_present(self):
+        return self.password_input.is_visible()
 
 
 @pytest.fixture(scope="function")
-def browser():
+def browser() -> Browser:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         yield browser
@@ -11,47 +57,38 @@ def browser():
 
 
 @pytest.fixture(scope="function")
-def page(browser):
+def login_page(browser) -> LoginPage(Page):
     page = browser.new_page()
     page.goto("http://localhost:3000")
-    yield page
+    yield LoginPage(page)
     page.close()
 
 
-def test_successful_login(page):
-    # Fill in the login form
-    page.fill('data-testid=email-input', 'test@example.com')
-    page.fill('data-testid=password-input', 'validpassword')
-    page.click('data-testid=login-button')
+@pytest.mark.integration
+def test_successful_login(login_page):
+    login_page.fill_email('test@example.com')
+    login_page.fill_password('validpassword')
+    login_page.click_login()
 
-    # Assert that the welcome message is displayed
-    welcome_message = page.query_selector('data-testid=welcome-message')
-    assert welcome_message is not None
-    assert welcome_message.text_content() == "Welcome! You are logged in."
+    assert login_page.welcome_message.is_visible()
+    assert login_page.get_welcome_message_text() == "Welcome! You are logged in."
 
 
-def test_invalid_password(page):
-    # Fill in the login form with an invalid password
-    page.fill('data-testid=email-input', 'test@example.com')
-    page.fill('data-testid=password-input', 'password')
-    page.click('data-testid=login-button')
+@pytest.mark.integration
+def test_invalid_password(login_page):
+    login_page.fill_email('test@example.com')
+    login_page.fill_password('password')
+    login_page.click_login()
 
-    # Assert that the error message is displayed
-    error_message = page.query_selector('data-testid=error-message')
-    assert error_message is not None
-    assert error_message.text_content() == 'Password cannot be "password"'
+    assert login_page.error_message.is_visible()
+    assert login_page.get_error_message_text() == 'Password cannot be "password"'
 
 
-def test_invalid_email(page):
-    # Fill in the login form with an invalid email
-    page.fill('data-testid=email-input', 'invalid-email')
-    page.fill('data-testid=password-input', 'validpassword')
-    page.click('data-testid=login-button')
+@pytest.mark.integration
+def test_invalid_email(login_page):
+    login_page.fill_email('invalid-email')
+    login_page.fill_password('validpassword')
+    login_page.click_login()
 
-    # Assert that the email field is still present
-    email_input = page.query_selector('data-testid=email-input')
-    assert email_input is not None, "Email input field is missing"
-
-    # Assert that the password field is still present
-    password_input = page.query_selector('data-testid=password-input')
-    assert password_input is not None, "Password input field is missing"
+    assert login_page.is_email_input_present(), "Email input field is missing"
+    assert login_page.is_password_input_present(), "Password input field is missing"
