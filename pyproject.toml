@@ -5,7 +5,7 @@ description = ""
 authors = ["Christian Lyons <christian.lyons@pm.me>"]
 
 packages = [
-    {include = "app", from = "." }
+    {include = "backend-app", from = "." }
 ]
 
 [tool.poetry.dependencies]
