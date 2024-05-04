@@ -32,8 +32,13 @@ class LoginPage:
     def fill_password(self, password):
         self.password_input.fill(password)
 
-    def click_login(self):
-        self.login_button.click()
+    def click_login(self, expect_routing=True):
+        if expect_routing:
+            with self.page.expect_request("**/login**") as login_req:
+                with self.page.expect_response("**/login**") as login_res:
+                    self.login_button.click()
+        else:
+            self.login_button.click()
 
     def get_welcome_message_text(self):
         return self.welcome_message.text_content()
@@ -83,7 +88,7 @@ class TestLoginPage:
     def test_invalid_email(self, login_page):
         login_page.fill_email('invalid-email')
         login_page.fill_password('validpassword')
-        login_page.click_login()
+        login_page.click_login(expect_routing=False)
 
         expect(login_page.email_input).to_be_visible()
         expect(login_page.password_input).to_be_visible()
