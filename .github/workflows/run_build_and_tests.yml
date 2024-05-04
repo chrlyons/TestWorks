@@ -1,0 +1,118 @@
+name: TestWorks CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: 3.10
+      NODE_VERSION: '22'
+      DATABASE_URL: 'localhost'
+      REDIS_URL: 'localhost'
+      ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
+      SECRET_KEY: ${{ secrets.TST_SECRET_KEY }}
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install backend dependencies
+        run: |
+          poetry install
+
+      - name: Start Docker Compose services
+        run: |
+          docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: |
+          sleep 60  # Adjust based on your services startup time
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Start React App
+        run: |
+          cd frontend
+          npm start &
+          sleep 30  # Wait for React app to be fully up and running
+
+      - name: Run Pytest with Coverage for Unit and Integration Tests
+        run: |
+          poetry run pytest tests/unit --cov=backend --cov-report xml:coverage-unit.xml
+          poetry run pytest tests/integration --cov=backend --cov-report xml:coverage-integration.xml
+
+      - name: Run Pytest with Coverage for E2E Tests
+        run: |
+          poetry run pytest tests/e2e --cov=backend --cov-report xml:coverage-e2e.xml
+
+      - name: Install Code Climate Test Reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+
+      - name: Before build
+        run: ./cc-test-reporter before-build
+
+      - name: Upload Coverage to Code Climate
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        run: |
+          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.unit.json coverage-unit.xml
+          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.integration.json coverage-integration.xml
+          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.e2e.json coverage-e2e.xml
+          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 3
+          ./cc-test-reporter upload-coverage
+
+      - name: After build
+        if: always()
+        run: ./cc-test-reporter after-build --exit-code ${{ job.status }}
+
+      - name: Shutdown Docker Compose services
+        if: always()
+        run: |
+          docker-compose down
+
