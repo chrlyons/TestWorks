@@ -62,7 +62,7 @@ jobs:
 
       - name: Wait for services to be ready
         run: |
-          sleep 60  # Adjust based on your services startup time
+          sleep 5
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -78,7 +78,7 @@ jobs:
         run: |
           cd frontend
           npm start &
-          sleep 30  # Wait for React app to be fully up and running
+          sleep 10
 
       - name: Run Pytest with Coverage for Unit and Integration Tests
         run: |
@@ -89,30 +89,18 @@ jobs:
         run: |
           poetry run pytest tests/e2e --cov=backend --cov-report xml:coverage-e2e.xml
 
-      - name: Install Code Climate Test Reporter
-        run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-          chmod +x ./cc-test-reporter
-
-      - name: Before build
-        run: ./cc-test-reporter before-build
-
-      - name: Upload Coverage to Code Climate
+      - name: Publish code coverage to Code Climate
+        uses: paambaati/codeclimate-action@v5
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        run: |
-          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.unit.json coverage-unit.xml
-          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.integration.json coverage-integration.xml
-          ./cc-test-reporter format-coverage -t cobertura -o coverage/codeclimate.e2e.json coverage-e2e.xml
-          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 3
-          ./cc-test-reporter upload-coverage
-
-      - name: After build
-        if: always()
-        run: ./cc-test-reporter after-build --exit-code ${{ job.status }}
+        with:
+          debug: true
+          coverageLocations: |
+            ./coverage-unit.xml:cobertura
+            ./coverage-integration.xml:cobertura
+            ./coverage-e2e.xml:cobertura
 
       - name: Shutdown Docker Compose services
         if: always()
         run: |
           docker-compose down
-
