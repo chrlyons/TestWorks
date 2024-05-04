@@ -1,13 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-import redis
 from backend.models import Report
 from backend.database import get_db
 from backend.schema import ReportCreate, ReportSchema
 
 report_router = APIRouter(prefix="/reports")
-
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 
 @report_router.post("/{user_id}")

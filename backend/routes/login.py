@@ -3,18 +3,10 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from backend.crud import create_access_token, verify_token
 
-from pydantic import BaseModel
-
-
 import re
 
 login_router = APIRouter(prefix="/login")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
-
-
-class LoginSchema(BaseModel):
-    username: str
-    password: str
 
 
 @login_router.post("/")
