@@ -31,7 +31,7 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       NODE_VERSION: '22'
-      DATABASE_URL: '127.0.0.1'
+      DATABASE_URL: 'postgresql://testuser:testpassword@localhost:5432/testdb'
       REDIS_URL: 'localhost'
       ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
       SECRET_KEY: ${{ secrets.TST_SECRET_KEY }}
