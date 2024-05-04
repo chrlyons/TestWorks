@@ -48,7 +48,7 @@ class LoginPage:
         return self.password_input.is_visible()
 
 
-@pytest.mark.e23
+@pytest.mark.e2e
 class TestLoginPage:
     @pytest.fixture(scope="function")
     def browser(self) -> Browser:
