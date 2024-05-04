@@ -86,15 +86,14 @@ jobs:
           poetry run pytest tests/unit --cov=backend --cov-report xml:coverage-unit.xml || true
           poetry run pytest tests/integration --cov=backend --cov-report xml:coverage-integration.xml || true
           poetry run pytest tests/e2e --cov=backend --cov-report xml:coverage-e2e.xml || true
-          poetry run pytest --junitxml=pytest-report.xml
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Pytest Test Report
-          path: ./pytest-report.xml
-          reporter: junit-xml
+          path: ./coverage-*.xml
+          reporter: java-junit
 
       - name: Publish coverage reports to Code Climate
         uses: paambaati/codeclimate-action@v5
