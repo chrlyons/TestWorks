@@ -31,7 +31,7 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       NODE_VERSION: '22'
-      DATABASE_URL: 'localhost'
+      DATABASE_URL: '127.0.0.1'
       REDIS_URL: 'localhost'
       ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
       SECRET_KEY: ${{ secrets.TST_SECRET_KEY }}
@@ -55,6 +55,7 @@ jobs:
       - name: Install backend dependencies
         run: |
           poetry install
+          poetry run playwright install chromium
 
       - name: Start Docker Compose services
         run: |
