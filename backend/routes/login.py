@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from backend.crud import create_access_token, verify_token
+from backend.crud import create_access_token
 
 import re
 
@@ -26,10 +26,3 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     # Create access token with the user's email as the subject
     access_token = create_access_token(data={"sub": username})
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=403, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"}
-    )
-    return verify_token(token, credentials_exception)
