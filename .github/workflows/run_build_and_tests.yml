@@ -83,16 +83,16 @@ jobs:
 
       - name: Run Pytest with Coverage for Unit/Integration/E2E Tests
         run: |
-          poetry run pytest tests/unit --cov=backend --cov-report xml:coverage-unit.xml || true
-          poetry run pytest tests/integration --cov=backend --cov-report xml:coverage-integration.xml || true
-          poetry run pytest tests/e2e --cov=backend --cov-report xml:coverage-e2e.xml || true
+          poetry run pytest -m "unit" --cov=backend --cov-report xml:coverage-unit.xml --junitxml=unit-tests.xml || true
+          poetry run pytest -m "integration" --cov=backend --cov-report xml:coverage-integration.xml --junitxml=integration-tests.xml || true
+          poetry run pytest -m "e2e" --cov=backend --cov-report xml:coverage-e2e.xml --junitxml=e2e-tests.xml || true
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Pytest Test Report
-          path: ./coverage-*.xml
+          path: ./*-tests.xml
           reporter: java-junit
 
       - name: Publish coverage reports to Code Climate
