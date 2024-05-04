@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -6,25 +7,43 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (password === 'password') {
-      setErrorMessage('Password cannot be "password"');
-      return;
-    }
+  const formData = new URLSearchParams();
+  formData.append('username', email);
+  formData.append('password', password);
 
-    // Perform dummy login validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrorMessage('Invalid email address');
-      return;
-    }
+  try {
+    const response = await axios.post('http://localhost:8000/login', formData);
 
-    // Login successful
+    const { access_token } = response.data;
+    localStorage.setItem('token', access_token);
     setLoggedIn(true);
     setErrorMessage('');
-  };
+  } catch (error) {
+    console.log(error.response.data);
+    if (error.response && error.response.data) {
+      let errorDetails = 'Error occurred';
+      if (error.response.data.detail) {
+        console.log(error.response.data.detail);
+        if (Array.isArray(error.response.data.detail)) {
+          errorDetails = error.response.data.detail.map(d => d.msg).join(", ");
+        } else {
+          errorDetails = error.response.data.detail.msg || JSON.stringify(error.response.data.detail);
+        }
+      } else {
+        errorDetails = 'Error response has no detail';
+      }
+      setErrorMessage(errorDetails);
+    } else if (error.request) {
+      setErrorMessage('No response from server');
+    } else {
+      setErrorMessage('Error: ' + error.message);
+    }
+  }
+
+};
 
   if (loggedIn) {
     return <div data-testid="welcome-message">Welcome! You are logged in.</div>;

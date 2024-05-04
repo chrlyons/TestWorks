@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import sync_playwright, Locator, Browser, Page
+from playwright.sync_api import sync_playwright, Locator, Browser, expect
 
 
 class LoginPage:
@@ -48,47 +48,42 @@ class LoginPage:
         return self.password_input.is_visible()
 
 
-@pytest.fixture(scope="function")
-def browser() -> Browser:
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        yield browser
-        browser.close()
+@pytest.mark.e23
+class TestLoginPage:
+    @pytest.fixture(scope="function")
+    def browser(self) -> Browser:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=False)
+            yield browser
+            browser.close()
 
+    @pytest.fixture(scope="function")
+    def login_page(self, browser) -> LoginPage:
+        page = browser.new_page()
+        page.goto("http://localhost:3000")
+        yield LoginPage(page)
+        page.close()
 
-@pytest.fixture(scope="function")
-def login_page(browser) -> LoginPage(Page):
-    page = browser.new_page()
-    page.goto("http://localhost:3000")
-    yield LoginPage(page)
-    page.close()
+    def test_successful_login(self, login_page):
+        login_page.fill_email('test@example.com')
+        login_page.fill_password('validpassword')
+        login_page.click_login()
 
+        expect(login_page.welcome_message).to_be_visible()
+        expect(login_page.welcome_message).to_have_text("Welcome! You are logged in.")
 
-@pytest.mark.integration
-def test_successful_login(login_page):
-    login_page.fill_email('test@example.com')
-    login_page.fill_password('validpassword')
-    login_page.click_login()
+    def test_invalid_password(self, login_page):
+        login_page.fill_email('test@example.com')
+        login_page.fill_password('password')
+        login_page.click_login()
 
-    assert login_page.welcome_message.is_visible()
-    assert login_page.get_welcome_message_text() == "Welcome! You are logged in."
+        expect(login_page.error_message).to_be_visible()
+        expect(login_page.error_message).to_contain_text("Password cannot be 'password'")
 
+    def test_invalid_email(self, login_page):
+        login_page.fill_email('invalid-email')
+        login_page.fill_password('validpassword')
+        login_page.click_login()
 
-@pytest.mark.integration
-def test_invalid_password(login_page):
-    login_page.fill_email('test@example.com')
-    login_page.fill_password('password')
-    login_page.click_login()
-
-    assert login_page.error_message.is_visible()
-    assert login_page.get_error_message_text() == 'Password cannot be "password"'
-
-
-@pytest.mark.integration
-def test_invalid_email(login_page):
-    login_page.fill_email('invalid-email')
-    login_page.fill_password('validpassword')
-    login_page.click_login()
-
-    assert login_page.is_email_input_present(), "Email input field is missing"
-    assert login_page.is_password_input_present(), "Password input field is missing"
+        expect(login_page.email_input).to_be_visible()
+        expect(login_page.password_input).to_be_visible()
