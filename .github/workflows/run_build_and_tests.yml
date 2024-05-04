@@ -81,14 +81,22 @@ jobs:
           npm start &
           sleep 10
 
-      - name: Run Pytest with Coverage for Unit and Integration Tests
+      - name: Run Pytest with Coverage for Unit/Integration/E2E Tests
         run: |
           poetry run pytest tests/unit --cov=backend --cov-report xml:coverage-unit.xml || true
           poetry run pytest tests/integration --cov=backend --cov-report xml:coverage-integration.xml || true
-      - name: Run Pytest with Coverage for E2E Tests
-        run: |
           poetry run pytest tests/e2e --cov=backend --cov-report xml:coverage-e2e.xml || true
-      - name: Publish code coverage to Code Climate
+          poetry run pytest --junitxml=pytest-report.xml
+
+      - name: Generate Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Pytest Test Report
+          path: ./pytest-report.xml
+          reporter: junit-xml
+
+      - name: Publish coverage reports to Code Climate
         uses: paambaati/codeclimate-action@v5
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
