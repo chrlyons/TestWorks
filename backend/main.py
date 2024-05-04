@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from app.routes.users import user_router
-from app.routes.reports import report_router
+from backend.routes.users import user_router
+from backend.routes.reports import report_router
 
-from app.database import engine
-from app.models import Base
+from backend.database import engine
+from backend.models import Base
 
 app = FastAPI()
 

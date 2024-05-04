@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 import redis
-from app.models import Report
-from app.database import get_db
-from app.schema import ReportCreate, ReportSchema
+from backend.models import Report
+from backend.database import get_db
+from backend.schema import ReportCreate, ReportSchema
 
 report_router = APIRouter(prefix="/reports")
 

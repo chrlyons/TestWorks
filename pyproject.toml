@@ -3,6 +3,7 @@ name = "testworks"
 version = "0.1.0"
 description = ""
 authors = ["Christian Lyons <christian.lyons@pm.me>"]
+license = "MIT"
 
 packages = [
     {include = "backend-app", from = "." }
@@ -11,7 +12,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.12"
 SQLAlchemy = "^2.0.29"
-fastapi = "^0.110.2"
+fastapi = "^0.110.3"
 python-dotenv = "^1.0.1"
 pyodbc = "^5.1.0"
 uvicorn = "^0.29.0"

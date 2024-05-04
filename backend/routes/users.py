@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import redis
-from app.models import User
-from app.database import get_db
-from app.schema import UserCreate
+from backend.models import User
+from backend.database import get_db
+from backend.schema import UserCreate
 
 user_router = APIRouter(prefix="/users")
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
