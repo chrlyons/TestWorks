@@ -1,3 +1,5 @@
+[![TestWorks CI](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml/badge.svg?branch=main)](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/6431d5283aa242da2953/test_coverage)](https://codeclimate.com/github/chrlyons/TestWorks/test_coverage)
 
 # TestWorks
 
