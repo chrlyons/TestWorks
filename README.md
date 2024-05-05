@@ -5,6 +5,17 @@
 
 Just a project to play around with some testing concepts. More to come...
 
+## Disclaimer
+
+🚧 Caution: Construction Zone Ahead! 🚧
+
+This project is in perpetual tinkering mode, which means:
+
+- **It's perfect for your test environments**, where chaos is expected and encouraged.
+- **It's not quite ready for the big leagues.** Like a toddler at a wedding, it’s best kept away from production environments where grown-up data lives.
+
+So, go ahead and push it, test it, and break it - but please, oh please, don't let it anywhere near your real-world operations unless you enjoy living on the edge... of a very steep cliff.
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
