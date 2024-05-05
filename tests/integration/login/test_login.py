@@ -10,7 +10,7 @@ class TestLogin:
         login_data = {"username": "test@example.com", "password": "secure_password"}
 
         # Make a request to login
-        response = client.post("/login/", data=login_data)
+        response = client.post("/api/login/", data=login_data)
 
         # Assert the response status code is 200 (OK)
         assert response.status_code == 200
@@ -25,7 +25,7 @@ class TestLogin:
         login_data = {"username": "test@example.com", "password": "password"}
 
         # Make a request to login with invalid password
-        response = client.post("/login/", data=login_data)
+        response = client.post("/api/login/", data=login_data)
 
         # Assert the response status code is 400 (Bad Request)
         assert response.status_code == 400
@@ -38,7 +38,7 @@ class TestLogin:
         login_data = {"username": "invalidemail", "password": "secure_password"}
 
         # Make a request to login with invalid email format
-        response = client.post("/login/", data=login_data)
+        response = client.post("/api/login/", data=login_data)
 
         # Assert the response status code is 400 (Bad Request)
         assert response.status_code == 400

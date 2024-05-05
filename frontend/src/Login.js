@@ -15,7 +15,7 @@ const Login = () => {
   formData.append('password', password);
 
   try {
-    const response = await axios.post('http://localhost:8000/login', formData);
+    const response = await axios.post('http://localhost/api/login', formData);
 
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
