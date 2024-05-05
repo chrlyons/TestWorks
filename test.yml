@@ -22,8 +22,10 @@ services:
       dockerfile: test.Dockerfile
     working_dir: /src/backend
     hostname: backend
-    ports:
-      - "8000:8000"
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - ./src/backend:/backend
     command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       PYTHONUNBUFFERED: 1
@@ -32,26 +34,49 @@ services:
       SECRET_KEY: "1<3TwoTestThings!123456789"
     depends_on:
       - db
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.services.backend.loadbalancer.sticky.cookie=true"
+      - "traefik.http.services.backend.loadbalancer.sticky.cookie.name=backend_cookie"
 
   frontend:
     build:
       context: frontend
       dockerfile: test.Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost
     hostname: frontend
-    ports:
-      - "3000:3000"
+#    ports:
+#      - "3000:3000"
     depends_on:
       - backend
     links:
       - backend
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
   redis:
     container_name: redis
     image: "redis:alpine"
     ports:
       - "6379:6379"
+
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 volumes:
   postgres_data:

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const apiBaseUrl = process.env.REACT_APP_API_URL
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +17,7 @@ const Login = () => {
   formData.append('password', password);
 
   try {
-    const response = await axios.post('http://localhost:8000/login', formData);
+    const response = await axios.post(`${apiBaseUrl}/api/login`, formData);
 
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);

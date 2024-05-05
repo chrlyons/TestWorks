@@ -33,6 +33,6 @@ app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
 
-app.include_router(login_router)
+app.include_router(login_router, prefix="/api")
 app.include_router(report_router, prefix="/api")
 app.include_router(user_router, prefix="/api")

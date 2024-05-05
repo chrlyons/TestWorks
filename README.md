@@ -60,6 +60,7 @@ DATABASE_URL = <Your_Database_URL>
 REDIS_URL = <Your_Redis_URL>
 ALGORITHM = <Your_JWT_Algorithm>
 SECRET_KEY = <Your_Secret_Key>
+frontend/REACT_APP_API_URL= <http://localhost | http://localhost:8000>
 ```
 
 Replace `<Your_Database_URL>`, `<Your_Redis_URL>`, `<Your_JWT_Algorithm>`, and `<Your_Secret_Key>` with your actual configuration values. These variables are essential for connecting to your database, configuring Redis, and setting up JWT authentication.
