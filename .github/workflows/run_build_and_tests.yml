@@ -89,12 +89,18 @@ jobs:
             ./coverage-integration.xml:cobertura
             ./coverage-e2e.xml:cobertura
 
-      - name: Publish code coverage to Codacy
+      - name: Publish code coverage reports to Codacy
         if: always()
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
+
+      - name: Publish code coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
 
       - name: Shutdown Docker Compose services
         if: always()
