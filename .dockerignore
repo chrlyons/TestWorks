@@ -1,0 +1,17 @@
+.github
+.idea
+.run
+htmlcov
+frontend
+tests
+.coverage
+.env
+.gitignore
+LICENSE
+docker-compose.yml
+pytest.ini
+README.md
+report.html
+test.yml
+test.Dockerfile
+__pycache__/
