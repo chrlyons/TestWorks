@@ -89,14 +89,12 @@ jobs:
             ./coverage-integration.xml:cobertura
             ./coverage-e2e.xml:cobertura
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+      - name: Publish code coverage to Codacy
         if: always()
+        uses: codacy/codacy-coverage-reporter-action@v1
         with:
-          token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          files: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
-          name: codecov-pytest
-          slug: chrlyons/testworks
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
 
       - name: Shutdown Docker Compose services
         if: always()
