@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: '3.10'
+      DATABASE_URL: 'postgresql://testuser:testpassword@localhost:5432/test'
 
     steps:
       - uses: actions/checkout@v4
