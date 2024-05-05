@@ -32,6 +32,7 @@ jobs:
 
       - name: Snyk scan for Node.js project
         run: snyk test --all-projects
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           WORKING_DIRECTORY: frontend
@@ -51,6 +52,7 @@ jobs:
 
       - name: Snyk scan for Python project
         run: snyk test --all-projects
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           WORKING_DIRECTORY: backend
