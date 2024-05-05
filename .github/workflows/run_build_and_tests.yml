@@ -60,6 +60,7 @@ jobs:
         run: |
           poetry install
           poetry run playwright install chromium
+          pip install coverage
 
       - name: Run Pytest with Coverage for Unit/Integration/E2E Tests
         continue-on-error: true
