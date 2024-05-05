@@ -93,7 +93,7 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         if: always()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           files: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
           name: codecov-pytest
           slug: chrlyons/testworks
