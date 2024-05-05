@@ -73,12 +73,13 @@ jobs:
         continue-on-error: true
         if: always()
         with:
-          name: Pytest Test Report
+          name: PyTest Report
           path: ./*-tests.xml
           reporter: java-junit
 
       - name: Publish coverage reports to Code Climate
         uses: paambaati/codeclimate-action@v5
+        if: always()
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
@@ -87,6 +88,15 @@ jobs:
             ./coverage-unit.xml:cobertura
             ./coverage-integration.xml:cobertura
             ./coverage-e2e.xml:cobertura
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
+          name: codecov-pytest
+          slug: chrlyons/testworks
 
       - name: Shutdown Docker Compose services
         if: always()
