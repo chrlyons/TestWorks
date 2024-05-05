@@ -31,6 +31,8 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       DATABASE_URL: 'postgresql://testuser:testpassword@localhost:5432/test'
+      ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
+      SECRET_KEY: "1<3TwoTestThings!123456789"
 
     steps:
       - uses: actions/checkout@v4
