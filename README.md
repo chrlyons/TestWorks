@@ -95,3 +95,11 @@ npm start
 ```
 
 This will start the frontend development server and open the application in your default web browser.
+
+### Launching Docker Test Instances
+
+```bash
+docker compose -f test.yml build
+docker compose -f test.yml up -d --scale backend=2
+```
+Navigate to `http://localhost`
