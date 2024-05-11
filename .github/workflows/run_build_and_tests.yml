@@ -31,14 +31,16 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       DATABASE_URL: 'postgresql://testuser:testpassword@localhost:5432/test'
+      REDIS_URL: 'redis://localhost:6379/0'
       ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
-      SECRET_KEY: "1<3TwoTestThings!123456789"
+      SECRET_KEY: '1<3TwoTestThings!123456789'
     strategy:
       fail-fast: false
       matrix:
         include:
           - test-type: unit
             directory: backend
+            compose-file: ''
           - test-type: integration
             directory: backend
             compose-file: 'test-integration.yml'
@@ -67,39 +69,42 @@ jobs:
           if [ "${{ matrix.test-type }}" == "e2e" ]; then
             poetry run playwright install chromium
           fi
-        working-directory: ./${{ matrix.directory }}
+        working-directory: "${{ github.workspace }}/${{ matrix.directory }}"
 
       - name: Start Docker Compose services
-        run: docker compose -f ${{ matrix.compose-file }} up -d
-        if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
+        if: matrix.compose-file != ''
+        run: docker compose -f ${{ github.workspace }}/${{ matrix.compose-file }} up -d
 
       - name: Run Tests
         continue-on-error: true
         run: |
-          poetry run pytest -m "${{ matrix.test-type }}" --cov=${{ matrix.directory }} --cov-report xml:coverage-${{ matrix.test-type }}.xml --junitxml=${{ matrix.test-type }}-tests.xml || true
-        working-directory: ./${{ matrix.directory }}
+          poetry run pytest -m "${{ matrix.test-type }}" --cov=. --cov-report xml:coverage-${{ matrix.test-type }}.xml --junitxml=test-results-${{ matrix.test-type }}.xml || true
+        working-directory: "${{ github.workspace }}/${{ matrix.directory }}"
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
-        continue-on-error: true
         if: always()
+        continue-on-error: true
         with:
           name: "PyTest Report - ${{ matrix.test-type }}"
-          path: ./${{ matrix.directory }}/*-tests.xml
+          path: ${{ github.workspace }}/${{ matrix.directory }}/test-results-${{ matrix.test-type }}.xml
           reporter: java-junit
 
-#      - name: Publish coverage reports to Codecov
-#        uses: codecov/codecov-action@v4.0.1
-#        if: always()
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          files: ./${{ matrix.directory }}/coverage-${{ matrix.test-type }}.xml
+      - name: Publish code coverage reports to Code Climate, Codacy, and Codecov
+        if: always()
+        run: |
+          curl -s https://codecov.io/bash | bash -s -- -t ${{ secrets.CODECOV_TOKEN }} -f "coverage-${{ matrix.test-type }}.xml"
+          ./cc-test-reporter after-build --exit-code $?
+          codacy-coverage-reporter report -l Java -r coverage-${{ matrix.test-type }}.xml
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        working-directory: "${{ github.workspace }}/${{ matrix.directory }}"
 
       - name: Shutdown Docker Compose services
+        if: matrix.compose-file != ''
         continue-on-error: true
-        if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
-        run: docker compose -f ${{ matrix.compose-file }} down
-
+        run: docker compose -f ${{ github.workspace }}/${{ matrix.compose-file }} down
 
 permissions:
   contents: read
