@@ -63,6 +63,11 @@ jobs:
       - name: Verify Poetry Installation
         run: poetry --version
 
+      - name: Setup Code Climate test-reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+
       - name: Install dependencies
         run: |
           poetry install
