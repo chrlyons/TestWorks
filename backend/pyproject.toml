@@ -6,7 +6,7 @@ authors = ["Christian Lyons <christian.lyons@pm.me>"]
 license = "MIT"
 
 packages = [
-    {include = "backend", from = "." }
+    {include = "app", from = "." }
 ]
 
 [tool.poetry.dependencies]

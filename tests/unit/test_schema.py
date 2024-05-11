@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.schema import UserCreate, ReportCreate, Report, ReportSchema
+from backend import UserCreate, ReportCreate, Report, ReportSchema
 
 
 @pytest.mark.unit

@@ -1,6 +1,4 @@
 import pytest
-from backend.schema import UserCreate
-from backend.crud import create_user, create_access_token
 
 
 @pytest.mark.integration

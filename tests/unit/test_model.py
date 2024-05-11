@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from backend.models import Base, User, Report
+from backend.app.models import Base, User, Report
 
 
 @pytest.mark.unit

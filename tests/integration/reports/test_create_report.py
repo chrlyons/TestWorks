@@ -1,5 +1,5 @@
 import pytest
-from backend.models import User
+from backend.app.models import User
 
 
 @pytest.fixture(scope="function")
