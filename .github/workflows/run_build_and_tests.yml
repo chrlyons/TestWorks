@@ -58,16 +58,29 @@ jobs:
 
       - name: Install backend dependencies
         run: |
+          cd backend
           poetry install
           poetry run playwright install chromium
-          pip install coverage
+        working-directory: ./backend
 
-      - name: Run Pytest with Coverage for Unit/Integration/E2E Tests
+      - name: Install e2e test dependencies
+        run: |
+          cd tests
+          poetry install
+        working-directory: ./tests
+
+      - name: Run backend unit and integration tests
         continue-on-error: true
         run: |
           poetry run pytest -m "unit" --cov=backend --cov-report xml:coverage-unit.xml --junitxml=unit-tests.xml || true
           poetry run pytest -m "integration" --cov=backend --cov-report xml:coverage-integration.xml --junitxml=integration-tests.xml || true
+        working-directory: ./backend
+
+      - name: Run end-to-end tests
+        continue-on-error: true
+        run: |
           poetry run pytest -m "e2e" --cov=backend --cov-report xml:coverage-e2e.xml --junitxml=e2e-tests.xml || true
+        working-directory: ./tests
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
@@ -86,22 +99,22 @@ jobs:
         with:
           debug: true
           coverageLocations: |
-            ./coverage-unit.xml:cobertura
-            ./coverage-integration.xml:cobertura
-            ./coverage-e2e.xml:cobertura
+            ./backend/coverage-unit.xml:cobertura
+            ./backend/coverage-integration.xml:cobertura
+            ./tests/coverage-e2e.xml:cobertura
 
       - name: Publish code coverage reports to Codacy
         if: always()
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
+          coverage-reports: ./backend/coverage-unit.xml,./backend/coverage-integration.xml,./tests/coverage-e2e.xml
 
       - name: Publish code coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage-unit.xml,./coverage-integration.xml,./coverage-e2e.xml
+          files: ./backend/coverage-unit.xml,./backend/coverage-integration.xml,./tests/coverage-e2e.xml
 
       - name: Shutdown Docker Compose services
         if: always()
