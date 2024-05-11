@@ -59,15 +59,8 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: Verify Poetry Installation
         run: poetry --version
-
-      - name: Setup Code Climate test-reporter
-        run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-          chmod +x ./cc-test-reporter
-
       - name: Install dependencies
         run: |
           poetry install
@@ -76,9 +69,14 @@ jobs:
           fi
         working-directory: "${{ github.workspace }}/${{ matrix.directory }}"
 
+      - name: Setup Code Climate test-reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+
       - name: Start Docker Compose services
         if: matrix.compose-file != ''
-        run: docker compose -f ${{ github.workspace }}/${{ matrix.compose-file }} up -d
+        run: docker compose -f "${{ github.workspace }}/${{ matrix.compose-file }}" up -d
 
       - name: Run Tests
         continue-on-error: true
@@ -92,15 +90,16 @@ jobs:
         continue-on-error: true
         with:
           name: "PyTest Report - ${{ matrix.test-type }}"
-          path: ${{ github.workspace }}/${{ matrix.directory }}/test-results-${{ matrix.test-type }}.xml
+          path: "${{ github.workspace }}/${{ matrix.directory }}/test-results-${{ matrix.test-type }}.xml"
           reporter: java-junit
 
-      - name: Publish code coverage reports to Code Climate, Codacy, and Codecov
+      - name: Publish code coverage reports
         if: always()
         run: |
+          ./cc-test-reporter before-build
           curl -s https://codecov.io/bash | bash -s -- -t ${{ secrets.CODECOV_TOKEN }} -f "coverage-${{ matrix.test-type }}.xml"
           ./cc-test-reporter after-build --exit-code $?
-          codacy-coverage-reporter report -l Java -r coverage-${{ matrix.test-type }}.xml
+          codacy-coverage-reporter report -l Java -r "coverage-${{ matrix.test-type }}.xml"
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
@@ -109,7 +108,7 @@ jobs:
       - name: Shutdown Docker Compose services
         if: matrix.compose-file != ''
         continue-on-error: true
-        run: docker compose -f ${{ github.workspace }}/${{ matrix.compose-file }} down
+        run: docker compose -f "${{ github.workspace }}/${{ matrix.compose-file }}" down
 
 permissions:
   contents: read
