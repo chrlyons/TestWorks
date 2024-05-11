@@ -58,15 +58,13 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          cd backend
           poetry install
-          poetry run playwright install chromium
         working-directory: ./backend
 
       - name: Install e2e test dependencies
         run: |
-          cd tests
           poetry install
+          poetry run playwright install chromium
         working-directory: ./tests
 
       - name: Run backend unit and integration tests
