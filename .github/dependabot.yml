@@ -11,6 +11,6 @@ updates:
       interval: "monthly"
 
   - package-ecosystem: "npm"
-    directory: "/frontend-app"
+    directory: "/frontend"
     schedule:
       interval: "monthly"
