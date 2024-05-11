@@ -67,7 +67,7 @@ jobs:
         working-directory: ./${{ matrix.directory }}
 
       - name: Start Docker Compose services
-        if: matrix.test-type == 'e2e'
+        if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
         run: docker compose -f test.yml up -d
 
       - name: Run Tests
