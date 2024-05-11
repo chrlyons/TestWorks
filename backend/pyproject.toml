@@ -6,7 +6,7 @@ authors = ["Christian Lyons <christian.lyons@pm.me>"]
 license = "MIT"
 
 packages = [
-    {include = "backend", from = "." }
+    {include = "app", from = "." }
 ]
 
 [tool.poetry.dependencies]
@@ -29,8 +29,6 @@ pytest = "^8.1.2"
 ruff = "^0.4.2"
 pytest-cov = "^5.0.0"
 pytest-html = "^4.1.1"
-playwright = "^1.43.0"
-pytest-playwright = "^0.4.4"
 
 [build-system]
 requires = ["poetry-core"]

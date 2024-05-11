@@ -3,8 +3,24 @@ name: Snyk Security Scan
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
 
 permissions:
   contents: read

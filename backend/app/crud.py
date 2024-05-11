@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
-from jose import jwt, JWTError
+from jose import jwt
 from dotenv import load_dotenv
 from os import getenv
 from sqlalchemy.orm import Session
 import redis
-from backend.models import User
-from backend.database import get_db
-from backend.schema import UserCreate
+from app.models import User
+from app.database import get_db
+from app.schema import UserCreate
 from fastapi import Depends
 
 load_dotenv()

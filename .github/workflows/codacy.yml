@@ -16,9 +16,25 @@ name: Codacy Security Scan
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/**'
+      - '.idea/**'
+      - '.run/**'
+      - '.vscode/**'
+      - 'README.md'
+      - '.gitattributes'
+      - '.gitignore'
   schedule:
     - cron: '35 17 * * 1'
 

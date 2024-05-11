@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "testworks tests"
+version = "0.1.0"
+description = ""
+authors = ["Christian Lyons <christian.lyons@pm.me>"]
+# readme = "README.md"
+
+packages = [
+    {include = "e2e", from = "." },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest-playwright = "^0.5.0"
+pytest = "^8.2.0"
+playwright = "^1.43.0"
+pytest-html = "^4.1.1"
+pytest-cov = "^5.0.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

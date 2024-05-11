@@ -1,0 +1,8 @@
+htmlcov
+tests
+.coverage
+.env
+.gitignore
+report.html
+test.Dockerfile
+__pycache__/
