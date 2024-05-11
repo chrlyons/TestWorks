@@ -65,7 +65,7 @@ class TestLoginPage:
     @pytest.fixture(scope="function")
     def login_page(self, browser) -> LoginPage:
         page = browser.new_page()
-        page.goto("http://localhost:3000")  # TODO: Switch with env variable
+        page.goto("http://localhost")  # TODO: Switch with env variable
         yield LoginPage(page)
         page.close()
 
