@@ -40,8 +40,10 @@ jobs:
             directory: backend
           - test-type: integration
             directory: backend
+            compose-file: 'test-integration.yml'
           - test-type: e2e
             directory: tests
+            compose-file: 'test.yml'
     steps:
       - uses: actions/checkout@v4
 
@@ -67,8 +69,8 @@ jobs:
         working-directory: ./${{ matrix.directory }}
 
       - name: Start Docker Compose services
+        run: docker compose -f ${{ matrix.compose-file }} up -d
         if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
-        run: docker compose -f test.yml up -d
 
       - name: Run Tests
         run: |
@@ -90,8 +92,9 @@ jobs:
           files: ./${{ matrix.directory }}/coverage-${{ matrix.test-type }}.xml
 
       - name: Shutdown Docker Compose services
-        if: matrix.test-type == 'e2e'
-        run: docker compose -f test.yml down
+        if: matrix.test-type == 'e2e' || matrix.test-type == 'integration'
+        run: docker compose -f ${{ matrix.compose-file }} down
+
 
 permissions:
   contents: read
