@@ -5,11 +5,13 @@ Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(255), unique=True, index=True)
     name = Column(String(255))
-    reports = relationship("Report", back_populates="owner")
+    reports = relationship(
+        "Report", back_populates="owner", cascade="all, delete-orphan"
+    )
 
 
 class Report(Base):
@@ -17,5 +19,5 @@ class Report(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), index=True)
     data = Column(String)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     owner = relationship("User", back_populates="reports")

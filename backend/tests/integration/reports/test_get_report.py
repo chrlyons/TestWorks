@@ -24,7 +24,9 @@ def test_get_report(client, user_and_report):
     response = client.get(f"/api/reports/{user_data.id}/{report_data.id}")
 
     # Check if the response status code is 200 OK
-    assert response.status_code == 200, f"Expected 200 OK, got {response.status_code}. Response body: {response.json()}"
+    assert (
+        response.status_code == 200
+    ), f"Expected 200 OK, got {response.status_code}. Response body: {response.json()}"
 
     # Check if the response data matches what was added
     response_data = response.json()
@@ -40,10 +42,11 @@ def test_get_invalid_report(client):
     response = client.get(f"/api/reports/1234567/98765")
 
     # Check if the response status code is 404 Not Found
-    assert response.status_code == 404, f"Expected 404 Not Found, got {response.status_code}. Response body: {response.json()}"
+    assert (
+        response.status_code == 404
+    ), f"Expected 404 Not Found, got {response.status_code}. Response body: {response.json()}"
 
     # Check if the response data matches error
     response_data = response.json()
     assert response_data["detail"] == "Report not found", "Report found"
     print("Response data:", response_data)
-
