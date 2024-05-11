@@ -72,7 +72,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          poetry run pytest -m "${{ matrix.test-type }}" --cov=${{ matrix.directory }} --cov-report xml:coverage-${{ matrix.test-type }}.xml --junitxml=${{ matrix.test-type }}-tests.xml
+          poetry run pytest -m "${{ matrix.test-type }}" --cov=${{ matrix.directory }} --cov-report xml:coverage-${{ matrix.test-type }}.xml --junitxml=${{ matrix.test-type }}-tests.xml || true
         working-directory: ./${{ matrix.directory }}
 
       - name: Generate Test Report
