@@ -26,100 +26,70 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-poetry.outputs.cache-key }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Get Poetry cache
+        id: cache-poetry
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
+  build-and-test:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - test-type: unit
+            directory: backend
+          - test-type: integration
+            directory: backend
+          - test-type: e2e
+            directory: tests
     env:
       PYTHON_VERSION: '3.10'
       DATABASE_URL: 'postgresql://testuser:testpassword@localhost:5432/test'
       ALGORITHM: ${{ secrets.TEST_ALGORITHM }}
       SECRET_KEY: "1<3TwoTestThings!123456789"
+      CACHE_KEY: ${{ needs.setup.outputs.cache-key }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
-      - name: Start Docker Compose services
-        run: |
-          docker compose -f test.yml up -d
-          sleep 10
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
           poetry install
-        working-directory: ./backend
+          if [ "${{ matrix.test-type }}" == "e2e" ]; then
+            poetry run playwright install chromium
+          fi
+        working-directory: ./${{ matrix.directory }}
 
-      - name: Install e2e test dependencies
-        run: |
-          poetry install
-          poetry run playwright install chromium
-        working-directory: ./tests
-
-      - name: Run backend unit and integration tests
+      - name: Run Tests
+        run: poetry run pytest -m "${{ matrix.test-type }}" --cov=${{ matrix.directory }} --cov-report xml:coverage-${{ matrix.test-type }}.xml --junitxml=${{ matrix.test-type }}-tests.xml
         continue-on-error: true
-        run: |
-          poetry run pytest -m "unit" --cov=backend --cov-report xml:coverage-unit.xml --junitxml=unit-tests.xml || true
-          poetry run pytest -m "integration" --cov=backend --cov-report xml:coverage-integration.xml --junitxml=integration-tests.xml || true
-        working-directory: ./backend
+        working-directory: ./${{ matrix.directory }}
 
-      - name: Run end-to-end tests
-        continue-on-error: true
-        run: |
-          poetry run pytest -m "e2e" --cov=backend --cov-report xml:coverage-e2e.xml --junitxml=e2e-tests.xml || true
-        working-directory: ./tests
-
-      - name: Generate Test Report
-        uses: dorny/test-reporter@v1
-        continue-on-error: true
-        if: always()
-        with:
-          name: PyTest Report
-          path: ./*-tests.xml
-          reporter: java-junit
-
-      - name: Publish coverage reports to Code Climate
-        uses: paambaati/codeclimate-action@v5
-        if: always()
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          debug: true
-          coverageLocations: |
-            ./backend/coverage-unit.xml:cobertura
-            ./backend/coverage-integration.xml:cobertura
-            ./tests/coverage-e2e.xml:cobertura
-
-      - name: Publish code coverage reports to Codacy
-        if: always()
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ./backend/coverage-unit.xml,./backend/coverage-integration.xml,./tests/coverage-e2e.xml
-
-      - name: Publish code coverage reports to Codecov
+      - name: Publish coverage reports
         uses: codecov/codecov-action@v4.0.1
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./backend/coverage-unit.xml,./backend/coverage-integration.xml,./tests/coverage-e2e.xml
+          files: ./${{ matrix.directory }}/coverage-${{ matrix.test-type }}.xml
 
       - name: Shutdown Docker Compose services
         if: always()
-        run: |
-          docker compose -f test.yml down
-
-permissions:
-  contents: read
-  actions: read
-  checks: write
+        run: docker compose -f test.yml down
