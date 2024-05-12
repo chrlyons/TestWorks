@@ -8,7 +8,7 @@ from app.crud import (
     get_user_by_username,
     redis_client,
     check_user_token_expiration,
-    generate_user_info
+    generate_user_info,
 )
 from app.schema import UserCreate
 import re

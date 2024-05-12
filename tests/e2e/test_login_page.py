@@ -34,8 +34,8 @@ class LoginPage:
 
     def click_login(self, expect_routing=True):
         if expect_routing:
-            with self.page.expect_request("**/login**") as login_req:
-                with self.page.expect_response("**/login**") as login_res:
+            with self.page.expect_request("**/login**"):
+                with self.page.expect_response("**/login**"):
                     self.login_button.click()
         else:
             self.login_button.click()

@@ -39,7 +39,7 @@ def test_get_report(client, user_and_report):
 @pytest.mark.integration
 def test_get_invalid_report(client):
     # Use the client to make a request to the get_report endpoint
-    response = client.get(f"/api/reports/1234567/98765")
+    response = client.get("/api/reports/1234567/98765")
 
     # Check if the response status code is 404 Not Found
     assert (
