@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 const apiBaseUrl = process.env.REACT_APP_API_URL;
@@ -8,15 +8,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-  const [ws, setWs] = useState(null);
+  const wsRef = useRef(null);
 
   const handleWebSocketConnect = () => {
     const token = localStorage.getItem('token');
     const wsUrl = `${apiBaseUrl.replace('http', 'ws')}/api/ws/${email}?token=${token}`;
-    const newWs = new WebSocket(wsUrl);
+    wsRef.current = new WebSocket(wsUrl); // Assign to ref
 
-    newWs.onopen = () => console.log('WebSocket connected');
-    newWs.onmessage = (message) => {
+    wsRef.current.onopen = () => console.log('WebSocket connected');
+    wsRef.current.onmessage = (message) => {
       try {
         const data = JSON.parse(message.data);
         console.log('Received data:', data);
@@ -24,10 +24,8 @@ const Login = () => {
         console.error('Error parsing message data:', e);
       }
     };
-    newWs.onclose = () => console.log('WebSocket disconnected');
-    newWs.onerror = (error) => console.error('WebSocket error:', error);
-
-    setWs(newWs);
+    wsRef.current.onclose = () => console.log('WebSocket disconnected');
+    wsRef.current.onerror = (error) => console.error('WebSocket error:', error);
   };
 
   const handleSubmit = async (e) => {
@@ -72,13 +70,14 @@ const Login = () => {
       <form onSubmit={handleSubmit} data-testid="login-form">
         <div>
           <label htmlFor="email">Email:</label>
-          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required data-testid="email-input" />
+          <input data-testid="email-input" id="email" onChange={(e) => setEmail(e.target.value)} required type="email" value={email}/>
         </div>
         <div>
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required data-testid="password-input" />
+        <label htmlFor="password">Password:</label>
+          <input data-testid="password-input" id="password" onChange={(e) => setPassword(e.target.value)} required
+                 type="password" value={password}/>
         </div>
-        <button type="submit" data-testid="login-button">Login</button>
+        <button data-testid="login-button" type="submit">Login</button>
       </form>
     </div>
   );

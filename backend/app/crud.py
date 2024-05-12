@@ -69,7 +69,6 @@ def create_user(user: UserCreate):
 
 
 def check_user_token_expiration():
-    import json
 
     current_time = datetime.now(timezone.utc)
     for key in redis_client.scan_iter("*"):
