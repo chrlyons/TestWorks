@@ -65,6 +65,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
+          pip install coverage
           if [ "${{ matrix.test-type }}" == "e2e" ]; then
             poetry run playwright install chromium
           fi
