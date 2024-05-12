@@ -33,6 +33,7 @@ def test_create_user(client):
     print("Response data:", response_data)
 
 
+@pytest.mark.integration
 def test_remove_user_from_database():
     fake = Faker()
     # Create a test user in the database
