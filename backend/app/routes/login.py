@@ -8,6 +8,7 @@ from app.crud import (
     get_user_by_username,
     redis_client,
     check_user_token_expiration,
+    generate_user_info
 )
 from app.schema import UserCreate
 import re
@@ -33,12 +34,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     db_user = get_user_by_username(username=username)
     if db_user:
         access_token, expire = create_access_token({"sub": username})
-        user_info = {
-            "status": "active",
-            "last_login": datetime.now(timezone.utc).isoformat(),
-            "access_token": access_token,
-            "token_expires": expire.isoformat(),
-        }
+        user_info = generate_user_info(access_token, expire)
         redis_expiration = int((expire - datetime.now(timezone.utc)).total_seconds())
         redis_key = f"{db_user.id}"
         print("Updating Redis:", user_info)

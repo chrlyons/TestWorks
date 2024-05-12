@@ -39,6 +39,15 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt, expire
 
 
+def generate_user_info(access_token, expire):
+    return {
+        "status": "active",
+        "last_login": datetime.now(timezone.utc).isoformat(),
+        "access_token": access_token,
+        "token_expires": expire.isoformat(),
+    }
+
+
 def create_user(user: UserCreate):
     from json import dumps
 
@@ -51,12 +60,7 @@ def create_user(user: UserCreate):
 
     access_token, expire = create_access_token({"sub": str(db_user.id)})
 
-    user_info = {
-        "status": "active",
-        "last_login": datetime.now(timezone.utc).isoformat(),
-        "access_token": access_token,
-        "token_expires": expire.isoformat(),
-    }
+    user_info = generate_user_info(access_token, expire)
 
     # Calculate the expiration time for Redis entry
     redis_expiration = int((expire - datetime.now(timezone.utc)).total_seconds())
