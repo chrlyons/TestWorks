@@ -8,23 +8,23 @@ class LoginPage:
 
     @property
     def email_input(self) -> Locator:
-        return self.page.get_by_test_id('email-input')
+        return self.page.get_by_test_id("email-input")
 
     @property
     def password_input(self) -> Locator:
-        return self.page.get_by_test_id('password-input')
+        return self.page.get_by_test_id("password-input")
 
     @property
     def login_button(self) -> Locator:
-        return self.page.get_by_test_id('login-button')
+        return self.page.get_by_test_id("login-button")
 
     @property
     def welcome_message(self) -> Locator:
-        return self.page.get_by_test_id('welcome-message')
+        return self.page.get_by_test_id("welcome-message")
 
     @property
     def error_message(self) -> Locator:
-        return self.page.get_by_test_id('error-message')
+        return self.page.get_by_test_id("error-message")
 
     def fill_email(self, email):
         self.email_input.fill(email)
@@ -70,24 +70,26 @@ class TestLoginPage:
         page.close()
 
     def test_successful_login(self, login_page):
-        login_page.fill_email('test@example.com')
-        login_page.fill_password('validpassword')
+        login_page.fill_email("test@example.com")
+        login_page.fill_password("validpassword")
         login_page.click_login()
 
         expect(login_page.welcome_message).to_be_visible()
         expect(login_page.welcome_message).to_have_text("Welcome! You are logged in.")
 
     def test_invalid_password(self, login_page):
-        login_page.fill_email('test@example.com')
-        login_page.fill_password('password')
+        login_page.fill_email("test@example.com")
+        login_page.fill_password("password")
         login_page.click_login()
 
         expect(login_page.error_message).to_be_visible()
-        expect(login_page.error_message).to_contain_text("Password cannot be 'password'")
+        expect(login_page.error_message).to_contain_text(
+            "Password cannot be 'password'"
+        )
 
     def test_invalid_email(self, login_page):
-        login_page.fill_email('invalid-email')
-        login_page.fill_password('validpassword')
+        login_page.fill_email("invalid-email")
+        login_page.fill_password("validpassword")
         login_page.click_login(expect_routing=False)
 
         expect(login_page.email_input).to_be_visible()

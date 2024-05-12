@@ -9,6 +9,7 @@ from app.crud import get_user_by_username, redis_client
 class TestRedisOperations:
     def test_redis_stores_session_on_login(self, client, faker):
         from dotenv import load_dotenv
+
         load_dotenv()
         email = faker.email()
         login_data = {"username": email, "password": "secure_password"}
