@@ -72,7 +72,7 @@ def check_user_token_expiration():
 
     current_time = datetime.now(timezone.utc)
     for key in redis_client.scan_iter("*"):
-        value = redis_client.get(key).decode("utf-8")
+        value = redis_client.get(key)
         expiration = redis_client.ttl(key)
 
         if value and expiration:
@@ -87,7 +87,7 @@ def check_user_token_expiration():
                 continue
 
             if current_time > expiration_time:
-                user_id = key.decode("utf-8")
+                user_id = key
                 remove_user_from_database(user_id)
 
 
