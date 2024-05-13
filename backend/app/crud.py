@@ -73,14 +73,19 @@ def create_user(user: UserCreate):
 
 
 def check_user_token_expiration():
-
     current_time = datetime.now(timezone.utc)
     for key in redis_client.scan_iter("*"):
         value = redis_client.get(key)
         expiration = redis_client.ttl(key)
 
         if value and expiration:
-            value_data = json.loads(value)
+            print(f"Key: {key}, Value: {value}")
+
+            try:
+                value_data = json.loads(value)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON for key {key}: {e}")
+                continue
 
             # Ensure expiration_time is timezone-aware
             if "token_expires" in value_data:
@@ -110,12 +115,6 @@ def remove_user_from_database(user_id: str):
 def get_user_by_username(username: str):
     db = next(get_db())
     return db.query(User).filter(User.username == username).first()
-
-
-def get_updated_user_data(user_id: int):
-    db = next(get_db())
-    user_data = db.query(User).filter(User.id == user_id).first()
-    return user_data
 
 
 def update_redis_user_session(user_id, session_info):

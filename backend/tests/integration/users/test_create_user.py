@@ -11,9 +11,11 @@ from app.crud import (
 )
 
 
+fake = Faker()
+
+
 @pytest.mark.integration
 def test_create_user(client):
-    fake = Faker()
     fake_name = fake.name()
     fake_user_name = fake.user_name()
 
@@ -35,7 +37,6 @@ def test_create_user(client):
 
 @pytest.mark.integration
 def test_remove_user_from_database():
-    fake = Faker()
     # Create a test user in the database
     unique_username = fake.user_name()
     name = fake.name()
@@ -49,3 +50,21 @@ def test_remove_user_from_database():
     db = next(get_db())
     deleted_user = db.query(User).filter(User.id == db_user.id).first()
     assert deleted_user is None
+
+
+@pytest.mark.integration
+def test_remove_user_from_database_exception():
+
+    # Create a test user in the database
+    unique_username = fake.user_name()
+    name = fake.name()
+    user_data = UserCreate(username=unique_username, name=name)
+    db_user, _ = create_user(user_data)
+
+    # Set wrong user
+    remove_user_from_database(str("I do not exist"))
+
+    # Check if the user is still in the database
+    db = next(get_db())
+    deleted_user = db.query(User).filter(User.id == db_user.id).first()
+    assert deleted_user is not None, f"User {db_user.id} still exists in the database."
