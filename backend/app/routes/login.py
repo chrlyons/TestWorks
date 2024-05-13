@@ -56,4 +56,5 @@ async def check_expiration(background_tasks: BackgroundTasks):
 
 @login_router.post("/logout")
 def logout():
-    remove_redis_user()
+    # remove_redis_user()
+    pass
