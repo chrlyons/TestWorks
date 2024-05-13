@@ -6,7 +6,7 @@ const apiBaseUrl = process.env.REACT_APP_API_URL;
 const InputField = ({ id, type, value, setValue, testId }) => (
   <div>
     <label htmlFor={id}>{id.charAt(0).toUpperCase() + id.slice(1)}:</label>
-    <input data-testid={testId} id={id} onChange={(e) => setValue(e.target.value)} required type={type} value={value}/>
+    <input data-testid={testId} id={id} onChange={(e) => setValue(e.target.value)} required type={type} value={value} />
   </div>
 );
 
@@ -43,11 +43,12 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${apiBaseUrl}/api/login`, formData);
-      const { access_token } = response.data;
+      const { access_token, user_id } = response.data;
       localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user_id', user_id);
       setLoggedIn(true);
       setErrorMessage('');
-      handleWebSocketConnect(); // Establish WebSocket connection after successful login
+      handleWebSocketConnect();
     } catch (error) {
       console.error('Login error:', error);
       processError(error);
@@ -66,11 +67,18 @@ const Login = () => {
     setErrorMessage(errorDetails);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const user_id = localStorage.getItem('user_id');
+    try {
+      await axios.post(`${apiBaseUrl}/api/login/logout`, { user_id });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     if (wsRef.current) {
       wsRef.current.close();
     }
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_id');
     setLoggedIn(false);
   };
 
