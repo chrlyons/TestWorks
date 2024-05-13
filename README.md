@@ -1,5 +1,6 @@
-[![TestWorks CI](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml/badge.svg?branch=main)](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/6431d5283aa242da2953/test_coverage)](https://codeclimate.com/github/chrlyons/TestWorks/test_coverage)
+[![TestWorks CI](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml/badge.svg)](https://github.com/chrlyons/TestWorks/actions/workflows/run_build_and_tests.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/28689e7e39f54942aee95cd8c850766f)](https://app.codacy.com/gh/chrlyons/TestWorks/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/28689e7e39f54942aee95cd8c850766f)](https://app.codacy.com/gh/chrlyons/TestWorks/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 # TestWorks
 
