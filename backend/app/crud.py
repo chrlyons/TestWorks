@@ -72,32 +72,48 @@ def create_user(user: UserCreate):
     return db_user, access_token
 
 
+def get_current_time():
+    return datetime.now(timezone.utc)
+
+
+def get_token_expiration(key):
+    expiration = redis_client.ttl(key)
+    return expiration
+
+
+def get_value_data(key):
+    value = redis_client.get(key)
+    try:
+        value_data = json.loads(value)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON for key {key}: {e}")
+        return None
+    return value_data
+
+
+def is_token_expired(expiration_time, current_time):
+    return current_time > expiration_time
+
+
+def process_expired_token(user_id):
+    remove_user_from_database(user_id)
+
+
 def check_user_token_expiration():
-    current_time = datetime.now(timezone.utc)
+    current_time = get_current_time()
     for key in redis_client.scan_iter("*"):
-        value = redis_client.get(key)
-        expiration = redis_client.ttl(key)
+        expiration = get_token_expiration(key)
 
-        if value and expiration:
-            print(f"Key: {key}, Value: {value}")
-
-            try:
-                value_data = json.loads(value)
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON for key {key}: {e}")
-                continue
-
-            # Ensure expiration_time is timezone-aware
-            if "token_expires" in value_data:
+        if expiration:
+            value_data = get_value_data(key)
+            if value_data and "token_expires" in value_data:
                 expiration_time = datetime.fromisoformat(value_data["token_expires"])
                 if expiration_time.tzinfo is None:
                     expiration_time = expiration_time.replace(tzinfo=timezone.utc)
-            else:
-                continue
 
-            if current_time > expiration_time:
-                user_id = key
-                remove_user_from_database(user_id)
+                if is_token_expired(expiration_time, current_time):
+                    user_id = key
+                    process_expired_token(user_id)
 
 
 def remove_user_from_database(user_id: str):
