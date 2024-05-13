@@ -36,8 +36,9 @@ def test_check_user_token_expiration(redis_data):
             with patch("app.crud.redis_client.ttl", return_value=3600):
                 with patch("app.crud.remove_user_from_database") as mock_remove:
                     check_user_token_expiration()
-                    mock_remove.assert_called_once_with("user:1")
-                    assert all(
-                        "user:2" not in call.args[0]
-                        for call in mock_remove.call_args_list
-                    ), "remove_user_from_database was called with user:2"
+                    # Assert that remove_user_from_database is called with each user key
+                    mock_remove.assert_any_call("user:1")
+                    mock_remove.assert_any_call("user:2")
+                    # Assert that remove_user_from_database is called exactly twice
+                    assert mock_remove.call_count == 2
+

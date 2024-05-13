@@ -91,8 +91,10 @@ def get_value_data(key):
     return value_data
 
 
-def is_token_expired(expiration_time, current_time):
-    return current_time > expiration_time
+def is_token_expired(expiration_time):
+    current_time = datetime.now(timezone.utc)
+    expiration_datetime = datetime.fromtimestamp(expiration_time, tz=timezone.utc)
+    return current_time > expiration_datetime
 
 
 def process_expired_token(user_id):
@@ -100,20 +102,11 @@ def process_expired_token(user_id):
 
 
 def check_user_token_expiration():
-    current_time = get_current_time()
     for key in redis_client.scan_iter("*"):
         expiration = get_token_expiration(key)
 
-        if expiration:
-            value_data = get_value_data(key)
-            if value_data and "token_expires" in value_data:
-                expiration_time = datetime.fromisoformat(value_data["token_expires"])
-                if expiration_time.tzinfo is None:
-                    expiration_time = expiration_time.replace(tzinfo=timezone.utc)
-
-                if is_token_expired(expiration_time, current_time):
-                    user_id = key
-                    process_expired_token(user_id)
+        if expiration and is_token_expired(expiration):
+            process_expired_token(key)
 
 
 def remove_user_from_database(user_id: str):
