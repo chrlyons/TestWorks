@@ -115,3 +115,7 @@ def get_user_by_username(username: str):
 def update_redis_user_session(user_id, session_info):
     # This function should update the Redis store with new session information
     redis_client.setex(f"user_session:{user_id}", 3600, json.dumps(session_info))
+
+
+def remove_redis_user(user_id):
+    redis_client.delete(user_id)

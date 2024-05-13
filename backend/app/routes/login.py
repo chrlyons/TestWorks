@@ -9,6 +9,7 @@ from app.crud import (
     redis_client,
     check_user_token_expiration,
     generate_user_info,
+    remove_redis_user,
 )
 from app.schema import UserCreate
 import re
@@ -51,3 +52,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def check_expiration(background_tasks: BackgroundTasks):
     background_tasks.add_task(check_user_token_expiration)
     return {"message": "Checking for expired tokens in the background"}
+
+
+@login_router.post("/logout")
+def logout():
+    remove_redis_user()

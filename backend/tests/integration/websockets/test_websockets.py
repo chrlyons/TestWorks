@@ -21,7 +21,7 @@ def test_websocket_endpoint_accepts_valid_token():
         with patch("app.crud.get_user_by_username", return_value=MockUser()):
             with patch("redis.Redis.ttl", return_value=3600):
                 with client.websocket_connect(
-                    f"/api/ws/test@example.com?token={valid_token}"
+                    f"/api/ws/test@example.com?access_token={valid_token}"
                 ) as websocket:
                     data = websocket.receive_json()
                     expected_time = 3600

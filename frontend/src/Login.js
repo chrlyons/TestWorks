@@ -3,6 +3,13 @@ import axios from 'axios';
 
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 
+const InputField = ({ id, type, value, setValue, testId }) => (
+  <div>
+    <label htmlFor={id}>{id.charAt(0).toUpperCase() + id.slice(1)}:</label>
+    <input data-testid={testId} id={id} onChange={(e) => setValue(e.target.value)} required type={type} value={value}/>
+  </div>
+);
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,8 +18,8 @@ const Login = () => {
   const wsRef = useRef(null);
 
   const handleWebSocketConnect = () => {
-    const token = localStorage.getItem('token');
-    const wsUrl = `${apiBaseUrl.replace('http', 'ws')}/api/ws/${email}?token=${token}`;
+    const token = localStorage.getItem('access_token');
+    const wsUrl = `${apiBaseUrl.replace('http', 'ws')}/api/ws/${email}?access_token=${token}`;
     wsRef.current = new WebSocket(wsUrl); // Assign to ref
 
     wsRef.current.onopen = () => console.log('WebSocket connected');
@@ -37,7 +44,7 @@ const Login = () => {
     try {
       const response = await axios.post(`${apiBaseUrl}/api/login`, formData);
       const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('access_token', access_token);
       setLoggedIn(true);
       setErrorMessage('');
       handleWebSocketConnect(); // Establish WebSocket connection after successful login
@@ -59,8 +66,21 @@ const Login = () => {
     setErrorMessage(errorDetails);
   };
 
+  const handleLogout = () => {
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+    localStorage.removeItem('access_token');
+    setLoggedIn(false);
+  };
+
   if (loggedIn) {
-    return <div data-testid="welcome-message">Welcome! You are logged in.</div>;
+    return (
+      <div>
+        <div data-testid="welcome-message">Welcome! You are logged in.</div>
+        <button data-testid="logout-button" onClick={handleLogout}>Logout</button>
+      </div>
+    );
   }
 
   return (
@@ -68,15 +88,8 @@ const Login = () => {
       <h2>Login</h2>
       {errorMessage && <div className="error-message" data-testid="error-message">{errorMessage}</div>}
       <form onSubmit={handleSubmit} data-testid="login-form">
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input data-testid="email-input" id="email" onChange={(e) => setEmail(e.target.value)} required type="email" value={email}/>
-        </div>
-        <div>
-        <label htmlFor="password">Password:</label>
-          <input data-testid="password-input" id="password" onChange={(e) => setPassword(e.target.value)} required
-                 type="password" value={password}/>
-        </div>
+        <InputField id="email" type="email" value={email} setValue={setEmail} testId="email-input" />
+        <InputField id="password" type="password" value={password} setValue={setPassword} testId="password-input" />
         <button data-testid="login-button" type="submit">Login</button>
       </form>
     </div>

@@ -11,7 +11,7 @@ websocket_router = APIRouter()
 @websocket_router.websocket("/ws/{email}")
 async def websocket_endpoint(websocket: WebSocket, email: str):
     await websocket.accept()
-    token = websocket.query_params.get("token")
+    token = websocket.query_params.get("access_token")
     if not token:
         await websocket.close(code=1008)
         return "Token is required"
