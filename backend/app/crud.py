@@ -72,23 +72,9 @@ def create_user(user: UserCreate):
     return db_user, access_token
 
 
-def get_current_time():
-    return datetime.now(timezone.utc)
-
-
 def get_token_expiration(key):
     expiration = redis_client.ttl(key)
     return expiration
-
-
-def get_value_data(key):
-    value = redis_client.get(key)
-    try:
-        value_data = json.loads(value)
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON for key {key}: {e}")
-        return None
-    return value_data
 
 
 def is_token_expired(expiration_time):
