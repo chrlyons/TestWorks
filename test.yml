@@ -30,6 +30,7 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
       DATABASE_URL: postgresql://testuser:testpassword@db:5432/test
+      REDIS_URL: redis://redis:6379/0
       ALGORITHM: "HS256"
       SECRET_KEY: "1<3TwoTestThings!123456789"
     depends_on:

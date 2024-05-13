@@ -18,7 +18,11 @@ def create_report(user_id: int, report: ReportCreate, db: Session = Depends(get_
 
 @report_router.get("/{user_id}/{report_id}", response_model=ReportSchema)
 def get_report(user_id: int, report_id: int, db: Session = Depends(get_db)):
-    report = db.query(Report).filter(Report.id == report_id, Report.user_id == user_id).first()
+    report = (
+        db.query(Report)
+        .filter(Report.id == report_id, Report.user_id == user_id)
+        .first()
+    )
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     return report

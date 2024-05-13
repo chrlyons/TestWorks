@@ -43,3 +43,18 @@ class TestLogin:
 
         # Assert the response contains the detail message for invalid email
         assert "Invalid email address" in response.text
+
+    def test_check_expiration(self, client):
+        # Test data
+        login_data = {"username": "test@example.com", "password": "secure_password"}
+
+        # Make a request to login
+        client.post("/api/login/", data=login_data)
+        response = client.post("/api/login/check-expiration")
+
+        # Assert the response status code is 200 (OK)
+        assert response.status_code == 200
+
+        assert response.json() == {
+            "message": "Checking for expired tokens in the background"
+        }
