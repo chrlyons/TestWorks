@@ -41,4 +41,3 @@ def test_check_user_token_expiration(redis_data):
                     mock_remove.assert_any_call("user:2")
                     # Assert that remove_user_from_database is called exactly twice
                     assert mock_remove.call_count == 2
-
