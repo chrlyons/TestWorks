@@ -84,6 +84,7 @@ def is_token_expired(expiration_time):
 
 
 def process_expired_token(user_id):
+    remove_redis_user(user_id)
     remove_user_from_database(user_id)
 
 
