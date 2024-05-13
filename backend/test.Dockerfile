@@ -1,7 +1,13 @@
 FROM python:3.12-slim AS base
 
 FROM base as base_plus
-RUN apt-get update && apt-get install -y libpq-dev gcc
+RUN pip install psycopg2-binary
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    python3-dev \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 
 FROM base_plus as poetry_env
