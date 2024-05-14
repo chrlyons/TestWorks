@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from app.crud import (
@@ -9,6 +9,7 @@ from app.crud import (
     redis_client,
     check_user_token_expiration,
     generate_user_info,
+    remove_redis_user,
 )
 from app.schema import UserCreate
 import re
@@ -44,10 +45,21 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         user_data = UserCreate(username=username, name=username)
         db_user, access_token = create_user(user_data)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user_id": db_user.id}
 
 
 @login_router.post("/check-expiration")
 async def check_expiration(background_tasks: BackgroundTasks):
     background_tasks.add_task(check_user_token_expiration)
     return {"message": "Checking for expired tokens in the background"}
+
+
+@login_router.post("/logout")
+async def logout(request: Request):
+    body = await request.json()
+    user_id = body.get("user_id")
+    if user_id:
+        remove_redis_user(user_id)
+        return {"message": "Logged out"}
+    else:
+        raise HTTPException(status_code=400, detail="User ID is required for logout")

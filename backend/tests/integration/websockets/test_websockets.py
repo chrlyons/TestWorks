@@ -11,7 +11,6 @@ class MockUser:
     username = "test@example.com"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_accepts_valid_token():
     client = TestClient(app)
@@ -21,7 +20,7 @@ def test_websocket_endpoint_accepts_valid_token():
         with patch("app.crud.get_user_by_username", return_value=MockUser()):
             with patch("redis.Redis.ttl", return_value=3600):
                 with client.websocket_connect(
-                    f"/api/ws/test@example.com?token={valid_token}"
+                    f"/api/ws/test@example.com?access_token={valid_token}"
                 ) as websocket:
                     data = websocket.receive_json()
                     expected_time = 3600
@@ -31,7 +30,6 @@ def test_websocket_endpoint_accepts_valid_token():
                     ), "Session time is not within the expected range"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_rejects_invalid_token():
     client = TestClient(app)
@@ -48,7 +46,6 @@ def test_websocket_endpoint_rejects_invalid_token():
     ), "Expected closure code for invalid token not received"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_closes_on_missing_token():
     client = TestClient(app)
@@ -62,7 +59,6 @@ def test_websocket_endpoint_closes_on_missing_token():
     ), "Expected closure code for missing token not received"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_closes_on_jwt_error():
     client = TestClient(app)
@@ -79,7 +75,6 @@ def test_websocket_endpoint_closes_on_jwt_error():
     ), "Expected closure code for JWT error not received"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_closes_on_jwt_error_missing_algorithm():
     client = TestClient(app)
@@ -97,7 +92,6 @@ def test_websocket_endpoint_closes_on_jwt_error_missing_algorithm():
     ), "Expected closure code for JWT error (missing algorithm) not received"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_closes_on_redis_key_absence():
     client = TestClient(app)
@@ -116,7 +110,6 @@ def test_websocket_endpoint_closes_on_redis_key_absence():
     ), "Expected closure code for Redis key absence not received"
 
 
-@pytest.mark.asyncio
 @pytest.mark.integration
 def test_websocket_endpoint_handles_websocket_disconnect_exception():
     client = TestClient(app)
