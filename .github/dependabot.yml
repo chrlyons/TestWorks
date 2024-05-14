@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: "monthly"
 
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "monthly"
+
   - package-ecosystem: "pip"
     directory: "/tests"
     schedule:

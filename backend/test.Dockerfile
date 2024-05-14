@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 FROM base_plus as poetry_env
-RUN pip install poetry
+RUN pip install poetry==1.8.3
 WORKDIR /backend
 COPY pyproject.toml poetry.lock* ./
 RUN poetry config virtualenvs.create false
