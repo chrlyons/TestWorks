@@ -4,7 +4,12 @@ import json
 from unittest.mock import patch
 from datetime import datetime, timezone, timedelta
 
-from app.crud import check_user_token_expiration, get_user_by_username, redis_client, update_redis_user_session
+from app.crud import (
+    check_user_token_expiration,
+    get_user_by_username,
+    redis_client,
+    update_redis_user_session,
+)
 
 
 @pytest.mark.integration
@@ -40,14 +45,14 @@ class TestRedisOperations:
             "user:1": json.dumps(
                 {
                     "token_expires": (
-                            datetime.now(timezone.utc) - timedelta(days=1)
+                        datetime.now(timezone.utc) - timedelta(days=1)
                     ).isoformat()
                 }
             ),
             "user:2": json.dumps(
                 {
                     "token_expires": (
-                            datetime.now(timezone.utc) + timedelta(days=1)
+                        datetime.now(timezone.utc) + timedelta(days=1)
                     ).isoformat()
                 }
             ),
@@ -56,8 +61,8 @@ class TestRedisOperations:
     def test_check_user_token_expiration(self, redis_data):
         with patch("app.crud.redis_client.scan_iter", return_value=redis_data.keys()):
             with patch(
-                    "app.crud.redis_client.get",
-                    side_effect=lambda k: redis_data[k].encode("utf-8"),
+                "app.crud.redis_client.get",
+                side_effect=lambda k: redis_data[k].encode("utf-8"),
             ):
                 with patch("app.crud.redis_client.ttl", return_value=3600):
                     with patch("app.crud.remove_user_from_database") as mock_remove:
