@@ -92,7 +92,7 @@ jobs:
 
       - name: Publish coverage reports to Code Climate
         uses: paambaati/codeclimate-action@v5
-        if: always()
+        if: always() && github.actor != 'dependabot[bot]'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
@@ -108,7 +108,7 @@ jobs:
 
       - name: Publish code coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
-        if: always()
+        if: always() && github.actor != 'dependabot[bot]'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: "${{ github.workspace }}/${{ matrix.directory }}/coverage-${{ matrix.test-type }}.xml"
