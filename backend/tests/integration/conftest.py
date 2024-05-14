@@ -35,11 +35,6 @@ def client(db_session):
     # Explicitly begin a nested transaction
     db_session.begin_nested()
 
-    @event.listens_for(db_session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
-            session.begin_nested()
-
     Base.metadata.create_all(bind=engine)
     app.dependency_overrides[get_db] = lambda: db_session
 

@@ -95,9 +95,9 @@ const Login = () => {
     <div>
       <h2>Login</h2>
       {errorMessage && <div className="error-message" data-testid="error-message">{errorMessage}</div>}
-      <form onSubmit={handleSubmit} data-testid="login-form">
-        <InputField id="email" setValue={setEmail} testId="email-input" type="email" value={email} />
-        <InputField id="password" setValue={setPassword} testId="password-input" type="password" value={password} />
+      <form data-testid="login-form" onSubmit={handleSubmit}>
+        <InputField id="email" setValue={setEmail} testId="email-input" type="email" value={email}/>
+        <InputField id="password" setValue={setPassword} testId="password-input" type="password" value={password}/>
         <button data-testid="login-button" type="submit">Login</button>
       </form>
     </div>
