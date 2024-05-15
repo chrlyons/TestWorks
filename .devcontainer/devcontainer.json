@@ -5,7 +5,7 @@
   "workspaceFolder": "/testworks",
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
-    "python.pythonPath": "/usr/local/bin/python",
+    "python.pythonPath": "/usr/local/bin/python"
   },
   "extensions": [
     "ms-python.python",
@@ -16,7 +16,7 @@
     3000,
     8000
   ],
-    "containerEnv": {
+  "containerEnv": {
     "DATABASE_URL": "postgresql://testuser:testpassword@db:5432/test",
     "REDIS_URL": "redis://redis:6379",
     "ALGORITHM": "HS256",
