@@ -1,0 +1,6 @@
+.coverage
+.env
+report.html
+test.Dockerfile
+__pycache__/
+node_modules/

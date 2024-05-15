@@ -1,0 +1,28 @@
+{
+  "name": "Full Stack Development Environment",
+  "dockerComposeFile": "../dev-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/testworks",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "python.pythonPath": "/usr/local/bin/python",
+  },
+  "extensions": [
+    "ms-python.python",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ],
+  "forwardPorts": [
+    3000,
+    8000
+  ],
+    "containerEnv": {
+    "DATABASE_URL": "postgresql://testuser:testpassword@db:5432/test",
+    "REDIS_URL": "redis://redis:6379",
+    "ALGORITHM": "HS256",
+    "SECRET_KEY": "1<3TwoTestThings!123456789",
+    "REACT_APP_API_URL": "http://localhost:8000"
+  },
+  "postCreateCommand": "echo 'Environment setup complete!'",
+  "remoteUser": "root"
+}
