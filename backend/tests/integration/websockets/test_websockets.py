@@ -16,7 +16,7 @@ def test_websocket_endpoint_accepts_valid_token():
     client = TestClient(app)
     valid_token = jwt.encode({"sub": "test@example.com"}, "secret", algorithm="HS256")
 
-    with patch("jose.jwt.decode", return_value={"sub": "test@example.com"}):
+    with patch("jwt.decode", return_value={"sub": "test@example.com"}):
         with patch("app.crud.get_user_by_username", return_value=MockUser()):
             with patch("redis.Redis.ttl", return_value=3600):
                 with client.websocket_connect(
@@ -81,7 +81,7 @@ def test_websocket_endpoint_closes_on_jwt_error_missing_algorithm():
     valid_token = jwt.encode({"sub": "test@example.com"}, "secret", algorithm="HS256")
 
     with pytest.raises(WebSocketDisconnect) as exc_info:
-        with patch("jose.jwt.decode", side_effect=jwt.JWTError("Missing algorithm")):
+        with patch("jwt.decode", side_effect=jwt.JWTError("Missing algorithm")):
             with client.websocket_connect(
                 f"/api/ws/test@example.com?token={valid_token}"
             ) as websocket:
