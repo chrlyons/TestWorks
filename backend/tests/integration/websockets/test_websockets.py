@@ -81,7 +81,7 @@ def test_websocket_endpoint_closes_on_jwt_error_missing_algorithm():
     valid_token = jwt.encode({"sub": "test@example.com"}, "secret", algorithm="HS256")
 
     with pytest.raises(WebSocketDisconnect) as exc_info:
-        with patch("jwt.decode", side_effect=jwt.JWTError("Missing algorithm")):
+        with patch("jwt.decode", side_effect=jwt.PyJWTError("Missing algorithm")):
             with client.websocket_connect(
                 f"/api/ws/test@example.com?token={valid_token}"
             ) as websocket:
