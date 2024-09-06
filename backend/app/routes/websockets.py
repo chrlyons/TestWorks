@@ -1,6 +1,8 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
-from jose import jwt, JWTError
+import jwt
+from jwt import PyJWTError
+
 from app.crud import SECRET_KEY, ALGORITHM, redis_client, get_user_by_username
 import asyncio
 import json
@@ -22,7 +24,7 @@ async def websocket_endpoint(websocket: WebSocket, email: str):
         if email != email_in_token:
             await websocket.close(code=1003)
             return "Invalid email or token mismatch"
-    except JWTError as e:
+    except PyJWTError as e:
         await websocket.close(code=1008)
         return f"JWT Error: {str(e)}"
 
