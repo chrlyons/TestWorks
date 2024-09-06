@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta, timezone
-from jose import jwt
+import jwt
 from dotenv import load_dotenv
 import json
 

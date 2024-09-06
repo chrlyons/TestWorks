@@ -2,7 +2,7 @@ import pytest
 from starlette.testclient import TestClient, WebSocketDisconnect
 from unittest.mock import patch
 
-from jose import jwt
+import jwt
 from app.main import app
 
 
