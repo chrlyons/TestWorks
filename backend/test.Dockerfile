@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.13-slim AS base
 
 FROM base as base_plus
 RUN pip install psycopg2-binary==2.9.9
